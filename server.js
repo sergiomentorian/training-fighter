@@ -265,6 +265,7 @@ const server = http.createServer(async (req, res) => {
       if (await api(req, res, apiUrl)) return;
       return json(res, 404, { error: 'Rota não encontrada.' });
     }
+    if (url.pathname === '/' || url.pathname === '/index.html') console.log('Page request cookie:', Boolean(parseCookies(req.headers.cookie || '').tf_session));
     await serveStatic(req, res, url);
   }
   catch (error) { if (!res.headersSent && !res.writableEnded) json(res, 500, { error: 'Erro interno do servidor.' }); else console.error('Request failed after response:', error.message); }
