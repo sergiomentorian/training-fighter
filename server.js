@@ -26,8 +26,9 @@ const send = (res, status, body, headers = {}) => {
 };
 const json = (res, status, body, headers = {}) => send(res, status, body, { 'cache-control': 'no-store', ...headers });
 const parseCookies = (value = '') => Object.fromEntries(value.split(';').map(part => part.trim().split('=').map(decodeURIComponent)).filter(([key]) => key));
-const cookie = (name, value, maxAge = 60 * 60 * 24 * 30) => `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-const clearCookie = name => `${name}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+const cookieAttributes = process.env.NODE_ENV === 'production' ? '; HttpOnly; SameSite=None; Secure' : '; HttpOnly; SameSite=Lax';
+const cookie = (name, value, maxAge = 60 * 60 * 24 * 30) => `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/${cookieAttributes}`;
+const clearCookie = name => `${name}=; Max-Age=0; Path=/${cookieAttributes}`;
 const sign = payload => jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
 const verify = token => { try { return jwt.verify(token, JWT_SECRET); } catch { return null; } };
 const deriveUser = (req) => verify(parseCookies(req.headers.cookie || '').tf_session);
