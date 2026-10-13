@@ -224,7 +224,7 @@ async function api(req, res, url) {
       await pool.query('UPDATE users SET app_state = $1, updated_at = NOW() WHERE id = $2', [nextState, userRecord.id]);
       const redirect = `${googleRedirect(originFromRequest(req))}/?google=connected`;
       console.log('Google OAuth session issued:', { userId: userRecord.id, hasSessionCookie: true });
-      res.writeHead(302, { location: redirect, 'set-cookie': [clearCookie('tf_google_state'), cookie('tf_session', sign({ id: userRecord.id, email: userRecord.email }))] });
+      res.writeHead(302, { location: redirect, 'set-cookie': cookie('tf_session', sign({ id: userRecord.id, email: userRecord.email })) });
       res.end();
     }
     catch (error) { console.error('Google OAuth callback failed:', error.message); send(res, 502, 'Não foi possível conectar o Google Calendar.'); }
