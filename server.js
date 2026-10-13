@@ -255,7 +255,9 @@ async function serveStatic(req, res, url) {
     const file = await fs.readFile(path.join(__dirname, requested));
     const contentType = mime[path.extname(requested)] || 'application/octet-stream';
     if (requested === '/index.html') {
+      const sessionToken = parseCookies(req.headers.cookie || '').tf_session;
       const user = await userFromRequest(req).catch(() => null);
+      console.log('Page session:', { hasCookie: Boolean(sessionToken), validToken: Boolean(verify(sessionToken)), userId: user?.id || null });
       const bootstrap = JSON.stringify(user ? { user: publicUser(user), state: user.app_state || {} } : null).replace(/</g, '\\u003c');
       const html = file.toString('utf8').replace('</head>', `<script>window.__TF_BOOTSTRAP__=${bootstrap};</script></head>`);
       res.writeHead(200, { 'content-type': contentType, 'cache-control': 'no-cache' });
