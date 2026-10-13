@@ -147,10 +147,7 @@ async function api(req, res, url) {
   if (url.pathname === '/api/me' && req.method === 'GET') {
     const sessionToken = parseCookies(req.headers.cookie || '').tf_session;
     const user = await userFromRequest(req);
-    if (!user) {
-      console.log('Session check failed:', { hasCookie: Boolean(sessionToken), validToken: Boolean(verify(sessionToken)) });
-      return json(res, 401, { error: 'Sessão ausente.' });
-    }
+    if (!user) return json(res, 401, { error: 'Sessão ausente.' });
     json(res, 200, { user: publicUser(user), state: user.app_state || {} });
     return true;
   }
@@ -223,7 +220,6 @@ async function api(req, res, url) {
       nextState.profile.photo = nextState.profile.photo || profile.picture || '';
       await pool.query('UPDATE users SET app_state = $1, updated_at = NOW() WHERE id = $2', [nextState, userRecord.id]);
       const redirect = `${googleRedirect(originFromRequest(req))}/?google=connected`;
-      console.log('Google OAuth session issued:', { userId: userRecord.id, hasSessionCookie: true });
       res.writeHead(302, { location: redirect, 'set-cookie': cookie('tf_session', sign({ id: userRecord.id, email: userRecord.email })) });
       res.end();
     }
@@ -255,9 +251,7 @@ async function serveStatic(req, res, url) {
     const file = await fs.readFile(path.join(__dirname, requested));
     const contentType = mime[path.extname(requested)] || 'application/octet-stream';
     if (requested === '/index.html') {
-      const sessionToken = parseCookies(req.headers.cookie || '').tf_session;
       const user = await userFromRequest(req).catch(() => null);
-      console.log('Page session:', { hasCookie: Boolean(sessionToken), validToken: Boolean(verify(sessionToken)), userId: user?.id || null });
       const bootstrap = JSON.stringify(user ? { user: publicUser(user), state: user.app_state || {} } : null).replace(/</g, '\\u003c');
       const html = file.toString('utf8').replace('</head>', `<script>window.__TF_BOOTSTRAP__=${bootstrap};</script></head>`);
       res.writeHead(200, { 'content-type': contentType, 'cache-control': 'no-cache' });
@@ -280,7 +274,6 @@ const server = http.createServer(async (req, res) => {
       if (await api(req, res, apiUrl)) return;
       return json(res, 404, { error: 'Rota não encontrada.' });
     }
-    if (url.pathname === '/' || url.pathname === '/index.html') console.log('Page request cookie:', Boolean(parseCookies(req.headers.cookie || '').tf_session));
     await serveStatic(req, res, url);
   }
   catch (error) { if (!res.headersSent && !res.writableEnded) json(res, 500, { error: 'Erro interno do servidor.' }); else console.error('Request failed after response:', error.message); }
