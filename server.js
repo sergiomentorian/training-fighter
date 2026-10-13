@@ -5,7 +5,6 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { URL } from 'node:url';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pg from 'pg';
 import OpenAI from 'openai';
@@ -46,13 +45,20 @@ async function ensureSchema() {
     CREATE TABLE IF NOT EXISTS users (
       id BIGSERIAL PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL,
+      password_hash TEXT,
+      google_sub TEXT UNIQUE,
+      display_name TEXT,
+      avatar_url TEXT,
       app_state JSONB NOT NULL DEFAULT '{}'::jsonb,
       google_tokens_encrypted TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  await pool.query('ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS google_sub TEXT UNIQUE');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT');
 }
 
 function encrypt(value) {
@@ -81,6 +87,35 @@ function googleClient() {
   return new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI);
 }
 
+function googleRedirect(origin = '') {
+  return String(process.env.APP_ORIGIN || origin || '/').replace(/\/$/, '');
+}
+
+function googleAuthUrl(state) {
+  const client = googleClient();
+  if (!client) return null;
+  return client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    include_granted_scopes: true,
+    scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/calendar'],
+    state
+  });
+}
+
+function googleStateCookie(state) {
+  return cookie('tf_google_state', state, 600);
+}
+
+function originFromRequest(req) {
+  const forwarded = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+  return `${forwarded || (process.env.NODE_ENV === 'production' ? 'https' : 'http')}://${req.headers.host || 'localhost'}`;
+}
+
+function publicUser(user) {
+  return { id: user.id, email: user.email, name: user.display_name || '', avatar: user.avatar_url || '' };
+}
+
 async function api(req, res, url) {
   if (url.pathname === '/api/health' && req.method === 'GET') {
     try { await pool.query('SELECT 1'); json(res, 200, { ok: true, database: 'up' }); }
@@ -89,19 +124,15 @@ async function api(req, res, url) {
   }
 
   if (url.pathname === '/api/auth/login' && req.method === 'POST') {
-    try {
-      const { email, password } = await readBody(req);
-      const normalized = String(email || '').trim().toLowerCase();
-      if (!/^\S+@\S+\.\S+$/.test(normalized) || String(password || '').length < 4) return json(res, 400, { error: 'Informe e-mail e senha válidos.' });
-      let { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [normalized]);
-      let user = rows[0];
-      if (!user) {
-        const passwordHash = await bcrypt.hash(String(password), 12);
-        ({ rows } = await pool.query('INSERT INTO users(email, password_hash) VALUES($1, $2) RETURNING *', [normalized, passwordHash]));
-        user = rows[0];
-      } else if (!(await bcrypt.compare(String(password), user.password_hash))) return json(res, 401, { error: 'E-mail ou senha incorretos.' });
-      json(res, 200, { user: { id: user.id, email: user.email }, state: user.app_state || {} }, { 'set-cookie': cookie('tf_session', sign({ id: user.id, email: user.email })) });
-    } catch (error) { json(res, 500, { error: 'Não foi possível iniciar a sessão.' }); }
+    return json(res, 410, { error: 'O Training Fighter usa somente o login com Google.' });
+  }
+
+  if (url.pathname === '/api/auth/google' && req.method === 'GET') {
+    const state = sign({ nonce: crypto.randomBytes(18).toString('hex'), intent: 'login' });
+    const authUrl = googleAuthUrl(state);
+    if (!authUrl) return json(res, 503, { error: 'O login com Google ainda não foi configurado no servidor.' });
+    res.writeHead(302, { location: authUrl, 'set-cookie': googleStateCookie(state) });
+    res.end();
     return true;
   }
 
@@ -113,12 +144,12 @@ async function api(req, res, url) {
   if (url.pathname === '/api/me' && req.method === 'GET') {
     const user = await userFromRequest(req);
     if (!user) return json(res, 401, { error: 'Sessão ausente.' });
-    json(res, 200, { user: { id: user.id, email: user.email }, state: user.app_state || {} });
+    json(res, 200, { user: publicUser(user), state: user.app_state || {} });
     return true;
   }
 
   const user = await userFromRequest(req);
-  if (url.pathname.startsWith('/api/') && !user && !['/api/health', '/api/auth/login', '/api/auth/logout'].includes(url.pathname)) return json(res, 401, { error: 'Faça login para continuar.' });
+  if (url.pathname.startsWith('/api/') && !user && !['/api/health', '/api/auth/login', '/api/auth/google', '/api/google/callback', '/api/auth/logout'].includes(url.pathname)) return json(res, 401, { error: 'Faça login para continuar.' });
 
   if (url.pathname === '/api/state' && req.method === 'GET') { json(res, 200, { state: user.app_state || {} }); return true; }
   if (url.pathname === '/api/state' && req.method === 'PUT') {
@@ -149,18 +180,43 @@ async function api(req, res, url) {
   if (url.pathname === '/api/google/start' && req.method === 'GET') {
     const client = googleClient();
     if (!client) return json(res, 503, { error: 'O Google Calendar ainda não foi configurado no servidor.' });
-    const state = sign({ id: user.id, nonce: crypto.randomBytes(12).toString('hex') });
-    const authUrl = client.generateAuthUrl({ access_type: 'offline', prompt: 'consent', scope: ['https://www.googleapis.com/auth/calendar'], state });
+    const state = sign({ id: user.id, nonce: crypto.randomBytes(18).toString('hex'), intent: 'calendar' });
+    const authUrl = googleAuthUrl(state);
     json(res, 200, { url: authUrl }, { 'set-cookie': cookie('tf_google_state', state, 600) });
     return true;
   }
   if (url.pathname === '/api/google/callback' && req.method === 'GET') {
     const oauthState = verify(url.searchParams.get('state'));
     const cookies = parseCookies(req.headers.cookie || '');
-    if (!oauthState || oauthState.id !== Number(deriveUser(req)?.id) || oauthState.nonce !== verify(cookies.tf_google_state)?.nonce) return send(res, 400, 'Autorização do Google inválida.');
+    const cookieState = verify(cookies.tf_google_state);
+    if (!oauthState || !cookieState || oauthState.nonce !== cookieState.nonce || oauthState.intent !== cookieState.intent) return send(res, 400, 'Autorização do Google inválida.');
     const client = googleClient();
-    try { const { tokens } = await client.getToken(url.searchParams.get('code')); await pool.query('UPDATE users SET google_tokens_encrypted = $1 WHERE id = $2', [encrypt(tokens), oauthState.id]); res.writeHead(302, { location: '/?google=connected', 'set-cookie': clearCookie('tf_google_state') }); res.end(); }
-    catch { send(res, 502, 'Não foi possível conectar o Google Calendar.'); }
+    if (!client || !url.searchParams.get('code')) return send(res, 400, 'Código de autorização ausente.');
+    try {
+      const { tokens } = await client.getToken(url.searchParams.get('code'));
+      client.setCredentials(tokens);
+      const { data: profile } = await google.oauth2({ version: 'v2', auth: client }).userinfo.get();
+      if (!profile.id || !profile.email || profile.verified_email === false) return send(res, 400, 'A conta Google precisa ter um e-mail verificado.');
+      const storedTokens = encrypt(tokens);
+      const existing = await pool.query('SELECT * FROM users WHERE google_sub = $1 OR email = $2 ORDER BY google_sub NULLS LAST LIMIT 1', [profile.id, String(profile.email).toLowerCase()]);
+      let userRecord = existing.rows[0];
+      if (userRecord) {
+        const result = await pool.query('UPDATE users SET google_sub = $1, email = $2, display_name = $3, avatar_url = $4, google_tokens_encrypted = $5, updated_at = NOW() WHERE id = $6 RETURNING *', [profile.id, String(profile.email).toLowerCase(), profile.name || '', profile.picture || '', storedTokens, userRecord.id]);
+        userRecord = result.rows[0];
+      } else {
+        const result = await pool.query('INSERT INTO users(email, google_sub, display_name, avatar_url, google_tokens_encrypted) VALUES($1, $2, $3, $4, $5) RETURNING *', [String(profile.email).toLowerCase(), profile.id, profile.name || '', profile.picture || '', storedTokens]);
+        userRecord = result.rows[0];
+      }
+      const nextState = userRecord.app_state && Object.keys(userRecord.app_state).length ? userRecord.app_state : {};
+      if (!Object.keys(nextState).length || !nextState.profile) nextState.profile = {};
+      nextState.profile.name = nextState.profile.name || profile.name || '';
+      nextState.profile.photo = nextState.profile.photo || profile.picture || '';
+      await pool.query('UPDATE users SET app_state = $1, updated_at = NOW() WHERE id = $2', [nextState, userRecord.id]);
+      const redirect = `${googleRedirect(originFromRequest(req))}/?google=connected`;
+      res.writeHead(302, { location: redirect, 'set-cookie': [clearCookie('tf_google_state'), cookie('tf_session', sign({ id: userRecord.id, email: userRecord.email }))] });
+      res.end();
+    }
+    catch (error) { console.error('Google OAuth callback failed:', error.message); send(res, 502, 'Não foi possível conectar o Google Calendar.'); }
     return true;
   }
   if (url.pathname === '/api/google/events' && req.method === 'GET') {
