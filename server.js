@@ -256,7 +256,17 @@ async function serveStatic(req, res, url) {
 }
 
 const server = http.createServer(async (req, res) => {
-  try { const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`); if (url.pathname.startsWith('/api/')) { if (await api(req, res, url)) return; return json(res, 404, { error: 'Rota não encontrada.' }); } await serveStatic(req, res, url); }
+  try {
+    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const isInternalApi = url.pathname.startsWith('/_tf-api/');
+    if (url.pathname.startsWith('/api/') || isInternalApi) {
+      const apiUrl = isInternalApi ? new URL(url) : url;
+      if (isInternalApi) apiUrl.pathname = `/api/${url.pathname.slice('/_tf-api/'.length)}`;
+      if (await api(req, res, apiUrl)) return;
+      return json(res, 404, { error: 'Rota não encontrada.' });
+    }
+    await serveStatic(req, res, url);
+  }
   catch (error) { if (!res.headersSent && !res.writableEnded) json(res, 500, { error: 'Erro interno do servidor.' }); else console.error('Request failed after response:', error.message); }
 });
 
