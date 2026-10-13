@@ -1,11 +1,11 @@
 {
   "name": "Training Fighter",
   "short_name": "Fighter",
-  "description": "Diário pessoal de treinos e evolução.",
+  "description": "Treine com intenção. Evolua com consistência.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#09110f",
-  "theme_color": "#09110f",
+  "background_color": "#030303",
+  "theme_color": "#030303",
   "lang": "pt-BR",
   "icons": []
 }
