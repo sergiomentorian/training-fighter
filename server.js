@@ -18,9 +18,11 @@ const APP_ENCRYPTION_KEY = crypto.createHash('sha256').update(process.env.APP_EN
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const send = (res, status, body, headers = {}) => {
+  if (res.headersSent || res.writableEnded) return true;
   const payload = typeof body === 'string' ? body : JSON.stringify(body);
   res.writeHead(status, { 'content-type': typeof body === 'string' ? 'text/plain; charset=utf-8' : 'application/json; charset=utf-8', ...headers });
   res.end(payload);
+  return true;
 };
 const json = (res, status, body, headers = {}) => send(res, status, body, { 'cache-control': 'no-store', ...headers });
 const parseCookies = (value = '') => Object.fromEntries(value.split(';').map(part => part.trim().split('=').map(decodeURIComponent)).filter(([key]) => key));
@@ -249,7 +251,7 @@ async function serveStatic(req, res, url) {
 
 const server = http.createServer(async (req, res) => {
   try { const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`); if (url.pathname.startsWith('/api/')) { if (await api(req, res, url)) return; return json(res, 404, { error: 'Rota não encontrada.' }); } await serveStatic(req, res, url); }
-  catch (error) { json(res, 500, { error: 'Erro interno do servidor.' }); }
+  catch (error) { if (!res.headersSent && !res.writableEnded) json(res, 500, { error: 'Erro interno do servidor.' }); else console.error('Request failed after response:', error.message); }
 });
 
 ensureSchema().then(() => server.listen(PORT, () => console.log(`Training Fighter listening on :${PORT}`))).catch(error => { console.error('Database initialization failed:', error.message); process.exit(1); });
