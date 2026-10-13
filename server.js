@@ -145,8 +145,12 @@ async function api(req, res, url) {
   }
 
   if (url.pathname === '/api/me' && req.method === 'GET') {
+    const sessionToken = parseCookies(req.headers.cookie || '').tf_session;
     const user = await userFromRequest(req);
-    if (!user) return json(res, 401, { error: 'Sessão ausente.' });
+    if (!user) {
+      console.log('Session check failed:', { hasCookie: Boolean(sessionToken), validToken: Boolean(verify(sessionToken)) });
+      return json(res, 401, { error: 'Sessão ausente.' });
+    }
     json(res, 200, { user: publicUser(user), state: user.app_state || {} });
     return true;
   }
@@ -219,6 +223,7 @@ async function api(req, res, url) {
       nextState.profile.photo = nextState.profile.photo || profile.picture || '';
       await pool.query('UPDATE users SET app_state = $1, updated_at = NOW() WHERE id = $2', [nextState, userRecord.id]);
       const redirect = `${googleRedirect(originFromRequest(req))}/?google=connected`;
+      console.log('Google OAuth session issued:', { userId: userRecord.id, hasSessionCookie: true });
       res.writeHead(302, { location: redirect, 'set-cookie': [clearCookie('tf_google_state'), cookie('tf_session', sign({ id: userRecord.id, email: userRecord.email }))] });
       res.end();
     }
