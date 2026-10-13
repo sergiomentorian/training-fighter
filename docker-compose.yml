@@ -15,7 +15,7 @@ services:
       retries: 20
 
   app:
-    build: .
+    build: https://github.com/sergiomentorian/training-fighter.git#main
     restart: unless-stopped
     depends_on:
       db:
