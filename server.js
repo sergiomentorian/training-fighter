@@ -251,7 +251,20 @@ const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
 async function serveStatic(req, res, url) {
   let requested = decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname);
   if (requested.includes('..')) return send(res, 400, 'Bad request');
-  try { const file = await fs.readFile(path.join(__dirname, requested)); res.writeHead(200, { 'content-type': mime[path.extname(requested)] || 'application/octet-stream', 'cache-control': requested.endsWith('.html') ? 'no-cache' : 'public, max-age=300' }); res.end(file); }
+  try {
+    const file = await fs.readFile(path.join(__dirname, requested));
+    const contentType = mime[path.extname(requested)] || 'application/octet-stream';
+    if (requested === '/index.html') {
+      const user = await userFromRequest(req).catch(() => null);
+      const bootstrap = JSON.stringify(user ? { user: publicUser(user), state: user.app_state || {} } : null).replace(/</g, '\\u003c');
+      const html = file.toString('utf8').replace('</head>', `<script>window.__TF_BOOTSTRAP__=${bootstrap};</script></head>`);
+      res.writeHead(200, { 'content-type': contentType, 'cache-control': 'no-cache' });
+      res.end(html);
+      return true;
+    }
+    res.writeHead(200, { 'content-type': contentType, 'cache-control': requested.endsWith('.html') ? 'no-cache' : 'public, max-age=300' });
+    res.end(file);
+  }
   catch { const file = await fs.readFile(path.join(__dirname, 'index.html')); res.writeHead(200, { 'content-type': mime['.html'] }); res.end(file); }
 }
 
