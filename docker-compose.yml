@@ -22,8 +22,14 @@ services:
         condition: service_healthy
     ports:
       - "${TRAINING_FIGHTER_PORT:-8787}:8787"
+    networks:
+      default:
+      mentorian-gateway-net:
+        aliases:
+          - training-fighter-google-app
     environment:
       PORT: 8787
+      NODE_ENV: production
       DATABASE_URL: postgresql://training_fighter:${POSTGRES_PASSWORD:-change-me-before-production}@db:5432/training_fighter
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:?APP_ENCRYPTION_KEY is required}
@@ -36,3 +42,8 @@ services:
 
 volumes:
   training_fighter_postgres:
+
+networks:
+  mentorian-gateway-net:
+    external: true
+    name: mentorian-gateway-net

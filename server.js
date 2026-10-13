@@ -149,7 +149,10 @@ async function api(req, res, url) {
   }
 
   const user = await userFromRequest(req);
-  if (url.pathname.startsWith('/api/') && !user && !['/api/health', '/api/auth/login', '/api/auth/google', '/api/google/callback', '/api/auth/logout'].includes(url.pathname)) return json(res, 401, { error: 'Faça login para continuar.' });
+  if (url.pathname.startsWith('/api/') && !user && !['/api/health', '/api/auth/login', '/api/auth/google', '/api/google/callback', '/api/auth/logout'].includes(url.pathname)) {
+    json(res, 401, { error: 'Faça login para continuar.' });
+    return true;
+  }
 
   if (url.pathname === '/api/state' && req.method === 'GET') { json(res, 200, { state: user.app_state || {} }); return true; }
   if (url.pathname === '/api/state' && req.method === 'PUT') {
