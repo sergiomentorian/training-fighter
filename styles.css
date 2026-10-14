@@ -141,10 +141,10 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 
 /* Dashboard de jogo: uma cena contínua, sem cartões empilhados. */
 .game-dashboard { display:grid; gap:34px; padding-bottom:28px; }
-.game-scene { min-height:310px; display:grid; grid-template-columns:190px minmax(220px,260px) minmax(0,1fr) minmax(180px,220px); align-items:center; gap:18px; padding:18px 8px 28px; position:relative; overflow:hidden; }
+.dashboard-topbar { min-height:54px; margin-bottom:14px; }.game-scene { min-height:310px; display:grid; grid-template-columns:220px minmax(240px,280px) minmax(180px,1fr); align-items:center; gap:24px; padding:18px 8px 28px; position:relative; overflow:hidden; }
 .game-scene:before { content:"FIGHT"; position:absolute; right:-10px; bottom:-42px; color:rgba(168,243,106,.065); font:700 clamp(120px,18vw,220px)/1 Barlow Condensed; transform:skew(-10deg); pointer-events:none; }
 .game-scene:after { content:""; position:absolute; inset:14px 18% 18px 0; background:radial-gradient(circle at 28% 52%, rgba(168,243,106,.22), transparent 37%), radial-gradient(circle at 69% 45%, rgba(80,168,65,.08), transparent 40%); pointer-events:none; }
-.game-scene-art, .game-scene-copy, .game-hud, .mission-notebook { position:relative; z-index:1; }
+.game-scene-art, .game-hud, .mission-notebook { position:relative; z-index:1; }
 .game-avatar { width:190px; height:220px; margin:auto; display:grid; place-items:center; position:relative; animation:game-idle 3.2s ease-in-out infinite; }
 .game-avatar svg { width:150px; height:190px; fill:rgba(168,243,106,.18); stroke:var(--green); stroke-width:8; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 12px 16px rgba(0,0,0,.3)); }
 .game-avatar-glow { position:absolute; width:150px; height:150px; border-radius:50%; background:rgba(168,243,106,.16); filter:blur(25px); }
@@ -162,7 +162,7 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 .quest-count { color:var(--green); font:700 25px/1 Barlow Condensed; }
 .mission-notebook { align-self:center; padding:16px 15px 12px; color:#32220f; background:linear-gradient(135deg,#fff1a7,#f6cd62); box-shadow:8px 9px 0 rgba(82,58,13,.16),0 12px 25px rgba(57,45,12,.16); transform:rotate(-2deg); }
 .mission-notebook:before { content:""; position:absolute; inset:6px; border:1px solid rgba(115,75,13,.22); pointer-events:none; }
-.notebook-head { position:relative; display:flex; justify-content:space-between; align-items:center; padding:0 2px 9px; border-bottom:2px solid rgba(91,57,11,.35); font:800 11px/1 Barlow Condensed; letter-spacing:.12em; }.notebook-head strong { font-size:22px; color:#a33216; }
+.notebook-head { position:relative; display:flex; justify-content:space-between; align-items:center; padding:0 2px 9px; border-bottom:2px solid rgba(91,57,11,.35); font:800 11px/1 Barlow Condensed; letter-spacing:.12em; }.notebook-head > div { display:grid; gap:3px; }.notebook-head small { color:#84642b; font:700 8px/1 Manrope,sans-serif; letter-spacing:.04em; text-transform:capitalize; }.notebook-head strong { font-size:22px; color:#a33216; }
 .notebook-list { position:relative; display:grid; margin-top:3px; background:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,rgba(83,62,23,.22) 32px); }
 .notebook-mission { position:relative; min-height:48px; display:flex; align-items:center; gap:8px; width:100%; padding:7px 1px; border:0; background:transparent; color:#35260f; text-align:left; transition:transform .16s ease, color .16s ease; }
 .notebook-mission:hover { transform:translateX(3px) rotate(.5deg); }.notebook-mission:active { transform:scale(.98); }
