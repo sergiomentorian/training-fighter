@@ -141,6 +141,41 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 .empty { color:var(--muted); text-align:center; padding:28px 10px; border:1px dashed var(--border); border-radius:12px; }
 .coach-answer { margin-top:14px; min-height:24px; color:var(--muted); white-space:pre-wrap; line-height:1.55; font-size:13px; }
 
+/* Navegação compacta: expande por hover e concentra a conta em um único menu. */
+.sidebar, .main { transition: width .2s ease, margin-left .2s ease; }
+.sidebar { overflow:visible; }
+.sidebar-foot { position:relative; }
+.account-trigger { width:100%; border:0; background:transparent; color:var(--text); padding:0; display:flex; align-items:center; gap:9px; text-align:left; }
+.account-trigger:hover { color:var(--green); }
+.account-trigger .sidebar-account-avatar { flex:none; }
+.account-trigger .sidebar-account-copy { flex:1; }
+.account-chevron { color:var(--muted); font-size:17px; line-height:1; transition:transform .18s ease; }
+.account-trigger[aria-expanded="true"] .account-chevron { transform:rotate(180deg); color:var(--green); }
+.account-popover { position:absolute; left:10px; bottom:calc(100% + 10px); width:220px; padding:12px; display:grid; gap:10px; background:var(--panel); border:1px solid var(--border); border-radius:15px; box-shadow:0 20px 50px rgba(0,0,0,.35); z-index:25; }
+.account-popover-head { display:flex; align-items:center; gap:9px; padding-bottom:9px; border-bottom:1px solid var(--border); }
+.account-popover-head .sidebar-account-avatar { flex:none; }
+.account-popover-head .sidebar-account-copy small { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
+.account-photo-action { display:flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--panel-2); color:var(--muted); border-radius:9px; padding:8px; font-size:11px; cursor:pointer; }
+.account-photo-action:hover { color:var(--green); border-color:var(--green-3); }
+.account-photo-action input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+.account-popover .sidebar-account-actions { margin:0; }
+.account-popover .storage-note { border-top:1px solid var(--border); padding-top:9px; }
+.shell.sidebar-collapsed .sidebar { width:76px; padding-left:10px; padding-right:10px; }
+.shell.sidebar-collapsed .main { margin-left:76px; width:calc(100% - 76px); }
+.shell.sidebar-collapsed .brand { padding-left:10px; padding-right:10px; }
+.shell.sidebar-collapsed .wordmark, .shell.sidebar-collapsed .nav-label, .shell.sidebar-collapsed .nav button > span:not(.nav-icon), .shell.sidebar-collapsed .account-trigger .sidebar-account-copy, .shell.sidebar-collapsed .account-chevron { display:none; }
+.shell.sidebar-collapsed .brand-lockup { justify-content:center; }
+.shell.sidebar-collapsed .nav button { justify-content:center; padding-left:8px; padding-right:8px; }
+.shell.sidebar-collapsed .sidebar-foot { padding-left:0; padding-right:0; }
+.shell.sidebar-collapsed .account-trigger { justify-content:center; }
+.shell.sidebar-collapsed .account-popover { left:calc(100% + 10px); bottom:0; }
+.shell.sidebar-collapsed .sidebar:hover { width:242px; }
+.shell.sidebar-collapsed .sidebar:hover .wordmark, .shell.sidebar-collapsed .sidebar:hover .nav-label, .shell.sidebar-collapsed .sidebar:hover .nav button > span:not(.nav-icon), .shell.sidebar-collapsed .sidebar:hover .account-trigger .sidebar-account-copy, .shell.sidebar-collapsed .sidebar:hover .account-chevron { display:block; }
+.shell.sidebar-collapsed .sidebar:hover .brand-lockup { justify-content:flex-start; }
+.shell.sidebar-collapsed .sidebar:hover .nav button { justify-content:flex-start; }
+.shell.sidebar-collapsed .sidebar:hover .account-trigger { justify-content:flex-start; }
+.shell.sidebar-collapsed .sidebar:hover .account-popover { left:10px; bottom:calc(100% + 10px); }
+
 @media (max-width: 1050px) { .stats-grid{grid-template-columns:repeat(2,1fr)}.two-col,.runner,.calendar-wrap,.water-layout,.profile-layout{grid-template-columns:1fr}.activity-grid{grid-template-columns:repeat(14,1fr)} }
 @media (max-width: 720px) { .sidebar{width:100%;height:66px;inset:auto 0 0;padding:7px 8px;border:0;border-top:1px solid var(--border);background:rgba(8,16,14,.95);display:block}.brand,.nav-label,.sidebar-foot{display:none}.nav{display:flex;justify-content:space-around;gap:2px}.nav button{padding:8px 7px;display:grid;gap:1px;justify-items:center;font-size:9px}.nav-icon{font-size:16px}.main{margin:0;width:100%;padding:18px 15px 94px}.topbar{margin-bottom:24px}.mobile-menu{display:grid}.topbar .top-actions .icon-btn:first-child{display:none}h1{font-size:33px}.page-head{align-items:flex-start;flex-direction:column}.stats-grid{gap:10px}.card{padding:16px}.stat-card{min-height:112px}.stat-value{font-size:29px}.workout-list{grid-template-columns:1fr}.form-grid,.form-grid.three{grid-template-columns:1fr}.field-full{grid-column:auto}.measure-cards{grid-template-columns:repeat(2,1fr)}.week{gap:3px}.day{min-height:76px;padding:5px}.event{font-size:8px}.event time{display:none}.print-sheet{padding:18px}.hero-title,.runner-title{font-size:32px}.activity-grid{gap:3px}.quick-grid{gap:7px}.quick{padding:10px}.runner-visual{min-height:330px}.form-actions{justify-content:stretch}.form-actions .btn{flex:1} }
 @media print { body{background:#fff;color:#111}.sidebar,.topbar,.page-head,.no-print,#toast-root{display:none!important}.main{margin:0;width:100%;padding:0}.page{display:none!important}.page.print-page{display:block!important}.print-sheet{box-shadow:none;margin:0;max-width:none} }
@@ -163,4 +198,13 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
   .login-brand { margin-bottom:34px; }
   .login .wordmark strong { font-size:27px; }
   .google-login { min-height:50px; }
+}
+
+@media (max-width:720px) {
+  .sidebar { padding-right:58px; }
+  .nav { padding-right:48px; }
+  .sidebar-foot { display:block; position:absolute; right:8px; top:7px; margin:0; padding:0; border:0; }
+  .account-trigger { width:43px; height:43px; justify-content:center; }
+  .account-trigger .sidebar-account-copy, .account-trigger .account-chevron { display:none; }
+  .account-popover { position:fixed; left:auto; right:8px; bottom:76px; width:min(260px,calc(100vw - 16px)); }
 }
