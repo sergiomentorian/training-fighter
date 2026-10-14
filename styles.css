@@ -144,18 +144,26 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 .sidebar, .main { transition: width .2s ease, margin-left .2s ease; }
 .sidebar { overflow:visible; }
 .sidebar-foot { position:relative; }
-.account-trigger { width:100%; border:0; background:transparent; color:var(--text); padding:0; display:flex; align-items:center; gap:9px; text-align:left; }
-.account-trigger:hover { color:var(--green); }
+.account-trigger { width:100%; border:0; background:transparent; color:var(--text); padding:5px 2px; display:flex; align-items:center; gap:9px; text-align:left; border-radius:11px; transition:background .18s ease, color .18s ease, transform .12s ease; }
+.account-trigger:hover { color:var(--green); background:var(--panel-2); }
+.account-trigger:active { transform:scale(.97); }
 .account-trigger .sidebar-account-avatar { flex:none; }
 .account-trigger .sidebar-account-copy { flex:1; }
 .account-chevron { color:var(--muted); font-size:17px; line-height:1; transition:transform .18s ease; }
 .account-trigger[aria-expanded="true"] .account-chevron { transform:rotate(180deg); color:var(--green); }
 .account-popover { position:absolute; left:10px; bottom:calc(100% + 10px); width:220px; padding:12px; display:grid; gap:10px; background:var(--panel); border:1px solid var(--border); border-radius:15px; box-shadow:0 20px 50px rgba(0,0,0,.35); z-index:25; }
 .account-popover[hidden] { display:none; }
+.account-popover.open { animation:account-menu-in .18s ease-out both; }
+@keyframes account-menu-in { from { opacity:0; transform:translateY(6px) scale(.98); } to { opacity:1; transform:none; } }
 .account-popover-head { display:flex; align-items:center; gap:9px; padding-bottom:9px; border-bottom:1px solid var(--border); }
 .account-popover-head .sidebar-account-avatar { flex:none; }
-.account-popover-head .sidebar-account-copy small { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
-.account-popover .sidebar-account-actions { margin:0; }
+.account-popover .sidebar-account-actions { display:grid; grid-template-columns:1fr; gap:8px; margin:0; }
+.account-popover .sidebar-account-actions button { width:100%; min-height:43px; display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:0 13px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); border-radius:10px; font-size:12px; font-weight:800; text-align:left; transition:background .18s ease, border-color .18s ease, color .18s ease, transform .12s ease, box-shadow .18s ease; }
+.account-popover .sidebar-account-actions button:hover { color:var(--green); border-color:var(--green-3); background:rgba(168,243,106,.10); transform:translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,.12); }
+.account-popover .sidebar-account-actions button:active { transform:translateY(0) scale(.98); box-shadow:none; }
+.account-popover .sidebar-account-actions .account-action-icon { width:18px; flex:none; display:grid; place-items:center; font-size:15px; line-height:1; }
+.account-popover .sidebar-account-actions button[data-account-action="logout"] { color:var(--red); border-color:rgba(255,113,113,.35); background:rgba(255,113,113,.08); }
+.account-popover .sidebar-account-actions button[data-account-action="logout"]:hover { color:#fff; border-color:var(--red); background:rgba(139,48,48,.92); }
 .settings-profile-summary { display:flex; align-items:center; gap:12px; padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--border); }
 .profile-avatar img { width:100%; height:100%; object-fit:cover; border-radius:inherit; }
 .profile-photo-action { display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--panel-2); color:var(--muted); border-radius:9px; padding:9px 12px; font-size:11px; cursor:pointer; }
