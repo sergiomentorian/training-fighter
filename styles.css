@@ -186,6 +186,8 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 .account-trigger:active { transform:scale(.97); }
 .account-trigger .sidebar-account-avatar { flex:none; }
 .account-trigger .sidebar-account-copy { flex:1; }
+.profile-shortcut { width:100%; border:0; background:transparent; color:var(--text); padding:5px 2px; display:flex; align-items:center; gap:9px; text-align:left; border-radius:11px; transition:background .18s ease, color .18s ease, transform .12s ease; }
+.profile-shortcut:hover { color:var(--green); background:var(--panel-2); }.profile-shortcut:active { transform:scale(.97); }.profile-shortcut .sidebar-account-avatar { flex:none; }.profile-shortcut .sidebar-account-copy { flex:1; }
 .account-chevron { color:var(--muted); font-size:17px; line-height:1; transition:transform .18s ease; }
 .account-trigger[aria-expanded="true"] .account-chevron { transform:rotate(180deg); color:var(--green); }
 .account-popover { position:absolute; left:10px; bottom:calc(100% + 10px); width:220px; padding:12px; display:grid; gap:10px; background:var(--panel); border:1px solid var(--border); border-radius:15px; box-shadow:0 20px 50px rgba(0,0,0,.35); z-index:25; }
@@ -219,17 +221,19 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 .shell.sidebar-collapsed .sidebar { width:76px; padding-left:10px; padding-right:10px; }
 .shell.sidebar-collapsed .main { margin-left:76px; width:calc(100% - 76px); }
 .shell.sidebar-collapsed .brand { padding-left:10px; padding-right:10px; }
-.shell.sidebar-collapsed .wordmark, .shell.sidebar-collapsed .nav-label, .shell.sidebar-collapsed .nav button > span:not(.nav-icon), .shell.sidebar-collapsed .account-trigger .sidebar-account-copy, .shell.sidebar-collapsed .account-chevron { display:none; }
+.shell.sidebar-collapsed .wordmark, .shell.sidebar-collapsed .nav-label, .shell.sidebar-collapsed .nav button > span:not(.nav-icon), .shell.sidebar-collapsed .account-trigger .sidebar-account-copy, .shell.sidebar-collapsed .profile-shortcut .sidebar-account-copy, .shell.sidebar-collapsed .account-chevron { display:none; }
 .shell.sidebar-collapsed .brand-lockup { justify-content:center; }
 .shell.sidebar-collapsed .nav button { justify-content:center; padding-left:8px; padding-right:8px; }
 .shell.sidebar-collapsed .sidebar-foot { padding-left:0; padding-right:0; }
 .shell.sidebar-collapsed .account-trigger { justify-content:center; }
+.shell.sidebar-collapsed .profile-shortcut { justify-content:center; }
 .shell.sidebar-collapsed .account-popover { left:calc(100% + 10px); bottom:0; }
 .shell.sidebar-collapsed .sidebar:hover { width:242px; }
-.shell.sidebar-collapsed .sidebar:hover .wordmark, .shell.sidebar-collapsed .sidebar:hover .nav-label, .shell.sidebar-collapsed .sidebar:hover .nav button > span:not(.nav-icon), .shell.sidebar-collapsed .sidebar:hover .account-trigger .sidebar-account-copy, .shell.sidebar-collapsed .sidebar:hover .account-chevron { display:block; }
+.shell.sidebar-collapsed .sidebar:hover .wordmark, .shell.sidebar-collapsed .sidebar:hover .nav-label, .shell.sidebar-collapsed .sidebar:hover .nav button > span:not(.nav-icon), .shell.sidebar-collapsed .sidebar:hover .account-trigger .sidebar-account-copy, .shell.sidebar-collapsed .sidebar:hover .profile-shortcut .sidebar-account-copy, .shell.sidebar-collapsed .sidebar:hover .account-chevron { display:block; }
 .shell.sidebar-collapsed .sidebar:hover .brand-lockup { justify-content:flex-start; }
 .shell.sidebar-collapsed .sidebar:hover .nav button { justify-content:flex-start; }
 .shell.sidebar-collapsed .sidebar:hover .account-trigger { justify-content:flex-start; }
+.shell.sidebar-collapsed .sidebar:hover .profile-shortcut { justify-content:flex-start; }
 .shell.sidebar-collapsed .sidebar:hover .account-popover { left:10px; bottom:calc(100% + 10px); }
 
 @media (max-width: 1050px) { .stats-grid{grid-template-columns:repeat(2,1fr)}.two-col,.runner,.calendar-wrap,.water-layout,.profile-layout{grid-template-columns:1fr}.activity-grid{grid-template-columns:repeat(14,1fr)}.game-scene{grid-template-columns:180px 1fr}.game-hud{grid-column:1 / -1;grid-template-columns:repeat(4,1fr);border-left:0}.game-stat{padding:8px 12px;border-top:1px solid var(--border);border-bottom:0;border-right:1px solid var(--border)}.game-stat:first-child{border-top:1px solid var(--border)}.game-stat:last-child{border-right:0}.quest-list{grid-template-columns:1fr} }
@@ -261,7 +265,9 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
   .nav { padding-right:48px; }
   .sidebar-foot { display:block; position:absolute; right:8px; top:7px; margin:0; padding:0; border:0; }
   .account-trigger { width:43px; height:43px; justify-content:center; }
+  .profile-shortcut { width:43px; height:43px; justify-content:center; }
   .account-trigger .sidebar-account-copy, .account-trigger .account-chevron { display:none; }
+  .profile-shortcut .sidebar-account-copy { display:none; }
   .account-popover { position:fixed; left:auto; right:8px; bottom:76px; width:min(260px,calc(100vw - 16px)); }
   .settings-appearance, .settings-data-row { align-items:flex-start; flex-direction:column; gap:12px; }
   .settings-appearance .theme-options, .settings-data-actions { width:100%; }
