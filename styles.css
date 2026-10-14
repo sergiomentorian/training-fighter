@@ -53,15 +53,16 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .sidebar-account-actions { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:12px; }
 .sidebar-account-actions button { border:1px solid var(--border); background:var(--panel-2); color:var(--muted); border-radius:8px; padding:7px 4px; font-size:10px; font-weight:700; }
 .sidebar-account-actions button:hover { color:var(--green); border-color:var(--green-3); }
-.main { margin-left:242px; width:calc(100% - 242px); padding:24px 34px 60px; max-width:1440px; }
+.main { margin:0; width:100%; padding:24px 48px 60px; max-width:none; }
 .topbar { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:34px; }
-.topbar-right { display:grid; justify-items:end; gap:10px; }
+.topbar-identity { display:flex; align-items:center; gap:24px; min-width:0; flex:1; }.app-logo-button { width:54px; height:54px; flex:none; display:grid; place-items:center; border:0; padding:0; background:transparent; }.app-logo-button:hover { transform:translateY(-1px); filter:drop-shadow(0 8px 10px rgba(255,127,30,.22)); }.topbar-heading { min-width:0; }
 .eyebrow { color:var(--green); text-transform:uppercase; letter-spacing:.14em; font-size:10px; font-weight:800; margin:0 0 6px; }
 h1,h2,h3 { margin:0; font-family: Barlow Condensed, sans-serif; letter-spacing:.01em; }
 h1 { font-size:37px; line-height:1; }
 h2 { font-size:26px; }
 h3 { font-size:20px; }
 .top-actions { display:flex; align-items:center; gap:10px; }
+.account-floating { width:42px; height:42px; flex:none; display:grid; place-items:center; padding:0; border:1px solid var(--border); border-radius:13px; background:var(--panel-2); transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease; }.account-floating:hover { transform:translateY(-1px); border-color:var(--green-3); box-shadow:0 8px 16px rgba(0,0,0,.12); }.account-floating:active { transform:scale(.96); }.account-floating .sidebar-account-avatar { width:34px; height:34px; border-radius:10px; }
 .icon-btn, .avatar { border:1px solid var(--border); background:var(--panel); color:var(--text); height:40px; min-width:40px; border-radius:12px; display:grid; place-items:center; }
 .avatar { border:0; background:var(--green); color:#142212; font-weight:800; }
 .mobile-menu { display:none; }
@@ -275,9 +276,12 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 }
 
 @media (max-width:720px) {
-  .dashboard-topbar > div:first-child { display:none; }
-  .dashboard-topbar .topbar-right, .dashboard-topbar .top-level-panel { width:100%; }
+  .dashboard-topbar { display:grid; gap:12px; align-items:start; }
+  .dashboard-topbar .topbar-identity, .dashboard-topbar .top-level-panel { width:100%; }
   .dashboard-topbar .top-actions { width:100%; justify-content:flex-end; }
+  .app-logo-button { width:42px; height:42px; }.app-logo-button .tf-logo-sidebar { width:42px; height:42px; }
+  .calendar-launch { font-size:0; width:40px; min-width:40px; padding:9px; }.calendar-launch:before { content:"□"; font-size:18px; }
+  .account-floating { width:40px; height:40px; }
   .sidebar { padding-right:58px; }
   .nav { padding-right:48px; }
   .sidebar-foot { display:block; position:absolute; right:8px; top:7px; margin:0; padding:0; border:0; }
