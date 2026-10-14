@@ -3,7 +3,7 @@ const todayISO = new Date().toISOString().slice(0, 10);
 const uid = (prefix='id') => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;
 const esc = (value='') => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const initials = (name='Fighter') => name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
-const fighterLogo = (size='md') => `<span class="tf-logo tf-logo-${size}" aria-label="Training Fighter"><svg viewBox="0 0 100 100" role="img" aria-hidden="true"><path class="tf-logo-shield" d="M13 20 50 8l37 12-5 52-32 20-32-20Z"/><path class="tf-logo-cut" d="m18 69 64-42"/><path class="tf-logo-letter" d="M25 31h25M37.5 31v38M53 31h24M53 31v38M53 49h18"/></svg></span>`;
+const fighterLogo = (size='md') => `<span class="tf-logo tf-logo-${size}" aria-label="Training Fighter"><img src="assets/training-fighter-mark-v1.png" alt="" /></span>`;
 const brandLockup = (size='md', subtitle=true) => `<div class="brand-lockup brand-lockup-${size}">${fighterLogo(size)}<div class="wordmark"><strong>TRAINING</strong><strong>FIGHTER</strong>${subtitle?'<small>treine com intenção</small>':''}</div></div>`;
 const fmtDate = (date) => new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short'}).format(new Date(`${date}T12:00:00`)).replace('.', '');
 const fmtLong = (date) => new Intl.DateTimeFormat('pt-BR',{weekday:'long',day:'numeric',month:'long'}).format(new Date(`${date}T12:00:00`));
