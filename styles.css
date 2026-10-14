@@ -55,7 +55,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .sidebar-account-actions { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:12px; }
 .sidebar-account-actions button { border:1px solid var(--border); background:var(--panel-2); color:var(--muted); border-radius:8px; padding:7px 4px; font-size:10px; font-weight:700; }
 .sidebar-account-actions button:hover { color:var(--green); border-color:var(--green-3); }
-.storage-note { color:#62756b; font-size:10px; line-height:1.45; }
 .main { margin-left:242px; width:calc(100% - 242px); padding:24px 34px 60px; max-width:1440px; }
 .topbar { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:34px; }
 .eyebrow { color:var(--green); text-transform:uppercase; letter-spacing:.14em; font-size:10px; font-weight:800; margin:0 0 6px; }
@@ -152,14 +151,16 @@ body.light { background:radial-gradient(circle at 76% -10%, #d9f0d3 0, transpare
 .account-chevron { color:var(--muted); font-size:17px; line-height:1; transition:transform .18s ease; }
 .account-trigger[aria-expanded="true"] .account-chevron { transform:rotate(180deg); color:var(--green); }
 .account-popover { position:absolute; left:10px; bottom:calc(100% + 10px); width:220px; padding:12px; display:grid; gap:10px; background:var(--panel); border:1px solid var(--border); border-radius:15px; box-shadow:0 20px 50px rgba(0,0,0,.35); z-index:25; }
+.account-popover[hidden] { display:none; }
 .account-popover-head { display:flex; align-items:center; gap:9px; padding-bottom:9px; border-bottom:1px solid var(--border); }
 .account-popover-head .sidebar-account-avatar { flex:none; }
 .account-popover-head .sidebar-account-copy small { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
-.account-photo-action { display:flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--panel-2); color:var(--muted); border-radius:9px; padding:8px; font-size:11px; cursor:pointer; }
-.account-photo-action:hover { color:var(--green); border-color:var(--green-3); }
-.account-photo-action input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .account-popover .sidebar-account-actions { margin:0; }
-.account-popover .storage-note { border-top:1px solid var(--border); padding-top:9px; }
+.settings-profile-summary { display:flex; align-items:center; gap:12px; padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--border); }
+.profile-avatar img { width:100%; height:100%; object-fit:cover; border-radius:inherit; }
+.profile-photo-action { display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--panel-2); color:var(--muted); border-radius:9px; padding:9px 12px; font-size:11px; cursor:pointer; }
+.profile-photo-action:hover { color:var(--green); border-color:var(--green-3); }
+.profile-photo-action input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .shell.sidebar-collapsed .sidebar { width:76px; padding-left:10px; padding-right:10px; }
 .shell.sidebar-collapsed .main { margin-left:76px; width:calc(100% - 76px); }
 .shell.sidebar-collapsed .brand { padding-left:10px; padding-right:10px; }
